@@ -198,4 +198,36 @@
 --    WHERE id = _update_id;
 --END;
 --$$;
+--
+--CREATE OR REPLACE FUNCTION sp_get_books_between(low DOUBLE PRECISION, high DOUBLE PRECISION)
+--RETURNS TABLE(id BIGINT, title TEXT, release_date DATE, price DOUBLE PRECISION, author_id BIGINT, author_name TEXT)
+--LANGUAGE plpgsql AS
+--$$
+--BEGIN
+--    RETURN QUERY
+--
+--    SELECT b.id, b.title, b.release_date, b.price, b.author_id, a.name
+--    FROM books b
+--    JOIN authors a ON b.author_id = a.id
+--    WHERE b.price BETWEEN low AND high;
+--END;
+--$$;
 
+CREATE OR REPLACE FUNCTION sp_get_books_not_by(_author1 TEXT, _author2 TEXT)
+RETURNS TABLE(id BIGINT, title TEXT, release_date DATE, price DOUBLE PRECISION, author_id BIGINT, author_name TEXT)
+LANGUAGE plpgsql AS
+$$
+BEGIN
+    RETURN QUERY
+    WITH books_auth1 AS (
+        SELECT * FROM books b1 WHERE b1.author_id IN (SELECT a1.id FROM authors a1 WHERE a1.name = _author1)
+    ), books_auth2 AS (
+        SELECT * FROM books b2 WHERE b2.author_id IN (SELECT a2.id FROM authors a2 WHERE a2.name = _author2)
+    )
+    SELECT b.id, b.title, b.release_date, b.price, b.author_id, a.name
+    FROM books b
+    JOIN authors a ON b.author_id = a.id
+    WHERE b.id NOT IN (SELECT books_auth1.id FROM books_auth1)
+    AND b.id NOT IN (SELECT books_auth2.id FROM books_auth2);
+END;
+$$;

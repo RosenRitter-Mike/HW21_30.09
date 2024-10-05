@@ -233,3 +233,41 @@ BEGIN
 END;
 $$;
 '''
+'''
+15.
+CREATE OR REPLACE FUNCTION sp_get_books_between(low DOUBLE PRECISION, high DOUBLE PRECISION)
+RETURNS TABLE(id BIGINT, title TEXT, release_date DATE, price DOUBLE PRECISION, author_id BIGINT, author_name TEXT)
+LANGUAGE plpgsql AS
+$$
+BEGIN
+    RETURN QUERY
+
+    SELECT b.id, b.title, b.release_date, b.price, b.author_id, a.name
+    FROM books b
+    JOIN authors a ON b.author_id = a.id
+    WHERE b.price BETWEEN low AND high;
+END;
+$$;
+'''
+'''
+16.
+CREATE OR REPLACE FUNCTION sp_get_books_not_by(_author1 TEXT, _author2 TEXT)
+RETURNS TABLE(id BIGINT, title TEXT, release_date DATE, price DOUBLE PRECISION, author_id BIGINT, author_name TEXT)
+LANGUAGE plpgsql AS
+$$
+BEGIN
+    RETURN QUERY
+    WITH books_auth1 AS (
+        SELECT * FROM books WHERE author_id = (SELECT id FROM authors WHERE name = _author1)
+    ), books_auth2 AS (
+        SELECT * FROM books WHERE author_id = (SELECT id FROM authors WHERE name = _author2)
+    )
+    SELECT b.id, b.title, b.release_date, b.price, b.author_id, a.name
+    FROM books b
+    JOIN authors a ON b.author_id = a.id
+    WHERE b.id NOT IN (SELECT books_auth1.id FROM books_auth1)
+    AND b.id NOT IN (SELECT books_auth2.id FROM books_auth2);
+END;
+$$;
+            
+'''

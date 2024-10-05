@@ -29,3 +29,6 @@
 --SELECT sp_insert_book('1984', '1949-06-08', 52.1, 72);
 --call sp_update_author('George Orwell', 72);
 
+--select * from sp_get_books_between(40.5, 60.25);
+
+select * from sp_get_books_not_by('J.R.R. Tolkien', 'Jane Austen');
