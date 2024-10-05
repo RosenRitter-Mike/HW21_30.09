@@ -297,5 +297,54 @@ $$;
 '''
 '''
 18.
+CREATE OR REPLACE FUNCTION book_data(_data TEXT)
+RETURNS TABLE(id BIGINT, title TEXT, release_date DATE, author_name TEXT)
+LANGUAGE plpgsql AS
+$$
+BEGIN
+    IF _data = 'D' THEN
+        RETURN QUERY
+        SELECT b.id, b.title, b.release_date, NULL::TEXT as author_name
+        FROM books b
+        JOIN authors a ON b.author_id = a.id;
+    ELSE
+        RETURN QUERY
+        SELECT b.id, b.title, NULL::DATE as release_date, a.name
+        FROM books b
+        JOIN authors a ON b.author_id = a.id;
+    END IF;
+END;
+$$;
+ 
+'''
+'''
+19.
+CREATE OR REPLACE FUNCTION book_sale(_book_name TEXT, _sale BOOL, _perc INT)
+RETURNS DOUBLE PRECISION
+LANGUAGE plpgsql AS
+$$
+DECLARE
+    new_price DOUBLE PRECISION := 0;
+BEGIN
+    IF _sale THEN
+        IF _perc > 0 AND _perc < 100 THEN
+            SELECT price INTO new_price
+            FROM books b
+            WHERE b.title = _book_name;
 
+            RETURN new_price * (1 - _perc/100.0); 
+        ELSE
+            RAISE EXCEPTION 'Percentage must be between 1 and 99';
+        END IF;
+    ELSIF _perc != 0 THEN
+        RAISE EXCEPTION 'Invalid, percentage should be 0 when not on sale';
+    ELSE
+        SELECT price INTO new_price
+        FROM books b
+        WHERE b.title = _book_name;
+
+        RETURN new_price;
+    END IF;
+END;
+$$;
 '''

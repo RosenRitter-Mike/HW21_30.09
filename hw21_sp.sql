@@ -231,25 +231,73 @@
 --    AND b.id NOT IN (SELECT books_auth2.id FROM books_auth2);
 --END;
 --$$;
+--
+--CREATE OR REPLACE FUNCTION upsert_book(
+--    _title TEXT, _release_date TIMESTAMP, _price DOUBLE PRECISION, _author_id BIGINT)
+--RETURNS BIGINT
+--LANGUAGE plpgsql AS
+--$$
+--DECLARE
+--    new_id BIGINT := 0;
+--BEGIN
+--     IF NOT EXISTS (SELECT 1 FROM books WHERE title = _title AND author_id = _author_id) THEN
+--        INSERT INTO books (title, release_date, price, author_id)
+--        VALUES (_title, _release_date, _price, _author_id)
+--        RETURNING id INTO new_id;
+--    ELSE
+--        UPDATE books
+--        SET title = _title, release_date = _release_date, price = _price, author_id = _author_id
+--        RETURNING id INTO new_id;
+--    END IF;
+--    RETURN new_id;
+--    
+--END;
+--$$;
+--
+--CREATE OR REPLACE FUNCTION book_data(_data TEXT)
+--RETURNS TABLE(id BIGINT, title TEXT, release_date DATE, author_name TEXT)
+--LANGUAGE plpgsql AS
+--$$
+--BEGIN
+--    IF _data = 'D' THEN
+--        RETURN QUERY
+--        SELECT b.id, b.title, b.release_date, NULL::TEXT as author_name
+--        FROM books b
+--        JOIN authors a ON b.author_id = a.id;
+--    ELSE
+--        RETURN QUERY
+--        SELECT b.id, b.title, NULL::DATE as release_date, a.name
+--        FROM books b
+--        JOIN authors a ON b.author_id = a.id;
+--    END IF;
+--END;
+--$$;
 
-CREATE OR REPLACE FUNCTION upsert_book(
-    _title TEXT, _release_date TIMESTAMP, _price DOUBLE PRECISION, _author_id BIGINT)
-RETURNS BIGINT
+CREATE OR REPLACE FUNCTION book_sale(_book_name TEXT, _sale BOOL, _perc INT)
+RETURNS DOUBLE PRECISION
 LANGUAGE plpgsql AS
 $$
 DECLARE
-    new_id BIGINT := 0;
+    new_price DOUBLE PRECISION := 0;
 BEGIN
-     IF NOT EXISTS (SELECT 1 FROM books WHERE title = _title AND author_id = _author_id) THEN
-        INSERT INTO books (title, release_date, price, author_id)
-        VALUES (_title, _release_date, _price, _author_id)
-        RETURNING id INTO new_id;
+    IF _sale THEN
+        IF _perc > 0 AND _perc < 100 THEN
+            SELECT price INTO new_price
+            FROM books b
+            WHERE b.title = _book_name;
+
+            RETURN new_price * (1 - _perc/100.0); 
+        ELSE
+            RAISE EXCEPTION 'Percentage must be between 1 and 99';
+        END IF;
+    ELSIF _perc != 0 THEN
+        RAISE EXCEPTION 'Invalid, percentage should be 0 when not on sale';
     ELSE
-        UPDATE books
-        SET title = _title, release_date = _release_date, price = _price, author_id = _author_id
-        RETURNING id INTO new_id;
+        SELECT price INTO new_price
+        FROM books b
+        WHERE b.title = _book_name;
+
+        RETURN new_price;
     END IF;
-    RETURN new_id;
-    
 END;
 $$;
