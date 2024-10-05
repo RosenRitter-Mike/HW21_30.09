@@ -4,13 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="da5fd347-cdb5-47fe-9ae3-86b3498d0a4d" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HW21.py" beforeDir="false" afterPath="$PROJECT_DIR$/HW21.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HW21_part2.py" beforeDir="false" afterPath="$PROJECT_DIR$/HW21_part2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hw21_sp.sql" beforeDir="false" afterPath="$PROJECT_DIR$/hw21_sp.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hw21_tests.sql" beforeDir="false" afterPath="$PROJECT_DIR$/hw21_tests.sql" afterDir="false" />
-    </list>
+    <list default="true" id="da5fd347-cdb5-47fe-9ae3-86b3498d0a4d" name="Changes" comment="HW21_18" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -63,6 +57,19 @@
       <option name="presentableId" value="Default" />
       <updated>1728023516999</updated>
     </task>
+    <task id="LOCAL-00001" summary="HW21_18">
+      <option name="closed" value="true" />
+      <created>1728122098690</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1728122098690</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="HW21_18" />
+    <option name="LAST_COMMIT_MESSAGE" value="HW21_18" />
   </component>
 </project>
