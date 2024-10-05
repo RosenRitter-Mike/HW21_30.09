@@ -19,8 +19,6 @@ try:
     print("------------- Query #01 --------------")
     if rows:
         for row in rows:
-            # rows_dict = dict(row)
-            # print(rows_dict)
             print(f"ID: {row['id']} TITLE: {row['title']:^20}, R.D.: {row['release_date']}, " +\
                   f"PRICE: {row['price']} AUTHOR: {row['author_name']:^8} ")
 
@@ -36,8 +34,7 @@ try:
         for row in rows:
             rows_dict = dict(row)
             print(rows_dict)
-            # print(f"ID: {row['id']} TITLE: {row['title']:^20}, R.D.: {row['release_date']}, " + \
-            #       f"PRICE: {row['price']} AUTHOR: {row['author_name']:^8} ")
+
 
     else:
         print("No books or authors found within the specified range.")

@@ -213,21 +213,43 @@
 --END;
 --$$;
 
-CREATE OR REPLACE FUNCTION sp_get_books_not_by(_author1 TEXT, _author2 TEXT)
-RETURNS TABLE(id BIGINT, title TEXT, release_date DATE, price DOUBLE PRECISION, author_id BIGINT, author_name TEXT)
+--CREATE OR REPLACE FUNCTION sp_get_books_not_by(_author1 TEXT, _author2 TEXT)
+--RETURNS TABLE(id BIGINT, title TEXT, release_date DATE, price DOUBLE PRECISION, author_id BIGINT, author_name TEXT)
+--LANGUAGE plpgsql AS
+--$$
+--BEGIN
+--    RETURN QUERY
+--    WITH books_auth1 AS (
+--        SELECT * FROM books b1 WHERE b1.author_id IN (SELECT a1.id FROM authors a1 WHERE a1.name = _author1)
+--    ), books_auth2 AS (
+--        SELECT * FROM books b2 WHERE b2.author_id IN (SELECT a2.id FROM authors a2 WHERE a2.name = _author2)
+--    )
+--    SELECT b.id, b.title, b.release_date, b.price, b.author_id, a.name
+--    FROM books b
+--    JOIN authors a ON b.author_id = a.id
+--    WHERE b.id NOT IN (SELECT books_auth1.id FROM books_auth1)
+--    AND b.id NOT IN (SELECT books_auth2.id FROM books_auth2);
+--END;
+--$$;
+
+CREATE OR REPLACE FUNCTION upsert_book(
+    _title TEXT, _release_date TIMESTAMP, _price DOUBLE PRECISION, _author_id BIGINT)
+RETURNS BIGINT
 LANGUAGE plpgsql AS
 $$
+DECLARE
+    new_id BIGINT := 0;
 BEGIN
-    RETURN QUERY
-    WITH books_auth1 AS (
-        SELECT * FROM books b1 WHERE b1.author_id IN (SELECT a1.id FROM authors a1 WHERE a1.name = _author1)
-    ), books_auth2 AS (
-        SELECT * FROM books b2 WHERE b2.author_id IN (SELECT a2.id FROM authors a2 WHERE a2.name = _author2)
-    )
-    SELECT b.id, b.title, b.release_date, b.price, b.author_id, a.name
-    FROM books b
-    JOIN authors a ON b.author_id = a.id
-    WHERE b.id NOT IN (SELECT books_auth1.id FROM books_auth1)
-    AND b.id NOT IN (SELECT books_auth2.id FROM books_auth2);
+     IF NOT EXISTS (SELECT 1 FROM books WHERE title = _title AND author_id = _author_id) THEN
+        INSERT INTO books (title, release_date, price, author_id)
+        VALUES (_title, _release_date, _price, _author_id)
+        RETURNING id INTO new_id;
+    ELSE
+        UPDATE books
+        SET title = _title, release_date = _release_date, price = _price, author_id = _author_id
+        RETURNING id INTO new_id;
+    END IF;
+    RETURN new_id;
+    
 END;
 $$;

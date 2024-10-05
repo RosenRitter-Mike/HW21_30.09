@@ -31,4 +31,6 @@
 
 --select * from sp_get_books_between(40.5, 60.25);
 
-select * from sp_get_books_not_by('J.R.R. Tolkien', 'Jane Austen');
+--select * from sp_get_books_not_by('J.R.R. Tolkien', 'Jane Austen');
+
+select upsert_book('Animal Farm', '1945-08-17', 42.1, 72);

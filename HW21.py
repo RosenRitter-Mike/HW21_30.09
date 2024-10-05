@@ -271,3 +271,31 @@ END;
 $$;
             
 '''
+'''
+17.
+CREATE OR REPLACE FUNCTION upsert_book(
+    _title TEXT, _release_date TIMESTAMP, _price DOUBLE PRECISION, _author_id BIGINT)
+RETURNS BIGINT
+LANGUAGE plpgsql AS
+$$
+DECLARE
+    new_id BIGINT := 0;
+BEGIN
+     IF NOT EXISTS (SELECT 1 FROM books WHERE title = _title AND author_id = _author_id) THEN
+        INSERT INTO books (title, release_date, price, author_id)
+        VALUES (_title, _release_date, _price, _author_id)
+        RETURNING id INTO new_id;
+    ELSE
+        UPDATE books
+        SET title = _title, release_date = _release_date, price = _price, author_id = _author_id
+        RETURNING id INTO new_id;
+    END IF;
+    RETURN new_id;
+    
+END;
+$$;
+'''
+'''
+18.
+
+'''
